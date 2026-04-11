@@ -14,11 +14,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 		guard let scena = (scene as? UIWindowScene) else { return }
-		let window = UIWindow(windowScene: scena)
-		window.rootViewController = ViewController()
-		window.makeKeyAndVisible()
-				
-		self.window = window
+		  let window = UIWindow(windowScene: scena)
+		  
+		  let storage = OnboardingStorageManager(userDefaults: .standard)
+		  let onboardingViewController = OnboardingViewController(storageManager: storage)
+		  let homeViewController = HomeViewController()
+		  
+		  window.rootViewController = storage.isFirstLaunch ? onboardingViewController : homeViewController
+		  window.makeKeyAndVisible()
+			
+		  self.window = window
 	}
 
 	func sceneDidDisconnect(_ scene: UIScene) {
