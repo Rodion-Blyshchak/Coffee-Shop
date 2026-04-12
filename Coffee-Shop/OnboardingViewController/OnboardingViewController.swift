@@ -76,52 +76,36 @@ class OnboardingViewController: UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		setupBackgroundImageView()
-		setupGetStartedButton()
-		setupDescriptionLabel()
-		setupTitleLabel()
+		setupUI()
 	}
 	
 	//MARK: - SetupFuncs
-	private func setupBackgroundImageView() {
-		view.addSubview(backgroundImageView)
+	private func setupUI() {
+		[backgroundImageView, titleLabel, descriptionLabel, getStartedButton].forEach {
+			view.addSubview($0)
+		}
 		
 		NSLayoutConstraint.activate([
+			// BackgroundImage
 			backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
 			backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-		])
-	}
-	
-	private func setupGetStartedButton() {
-		view.addSubview(getStartedButton)
-		
-		NSLayoutConstraint.activate([
+			backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+			
+			// Button
 			getStartedButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: ConstantsSize.negativeMainIndent),
 			getStartedButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			getStartedButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
-		])
-	}
-	
-	private func setupDescriptionLabel() {
-		view.addSubview(descriptionLabel)
-		
-		NSLayoutConstraint.activate([
+			
+			// Description
 			descriptionLabel.bottomAnchor.constraint(equalTo: getStartedButton.topAnchor, constant: ConstantsSize.negativeMainIndent),
 			descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
-		])
-	}
-	
-	private func setupTitleLabel() {
-		view.addSubview(titleLabel)
-		
-		NSLayoutConstraint.activate([
+			
+			// Title
 			titleLabel.bottomAnchor.constraint(equalTo: descriptionLabel.topAnchor, constant: ConstantsSize.negativeMainIndent),
 			titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
