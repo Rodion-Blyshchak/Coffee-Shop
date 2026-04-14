@@ -8,17 +8,13 @@
 import UIKit
 
 class OnboardingViewController: UIViewController {
-	enum ConstantsSize {
-		static let mainIndent: CGFloat = 24
-		static let negativeMainIndent: CGFloat = -24
-		static let fontTitle: CGFloat = 38
-		static let fontSubTitle: CGFloat = 18
-		static let cornerRadius: CGFloat = 16
-		static let numberOfLines: Int = 0
-	}
-	
 	//MARK: - Properties
-	private let storageManager: OnboardingStorageManagerProtocol
+	private let userDefaults: UserDefaults
+	private let onboardingCompletedKey = "onboardingCompleted"
+	
+	private var isFirstLaunch: Bool {
+		return !userDefaults.bool(forKey: onboardingCompletedKey)
+	}
 	
 	private let backgroundImageView: UIImageView = {
 		let imageView = UIImageView()
@@ -33,9 +29,9 @@ class OnboardingViewController: UIViewController {
 		let title = UILabel()
 		title.translatesAutoresizingMaskIntoConstraints = false
 		title.text = "Fall in Love with Coffee in Blissful Delight!"
-		title.font = .sora(size: ConstantsSize.fontTitle, weight: .semiBold)
-		title.textColor = .appWhite
-		title.numberOfLines = ConstantsSize.numberOfLines
+		title.font = .sora(size: Constraint.xxLarge, weight: .semiBold)
+		title.textColor = Colors.primaryText
+		title.numberOfLines = 0
 		title.textAlignment = .center
 		return title
 	}()
@@ -44,9 +40,9 @@ class OnboardingViewController: UIViewController {
 		let description = UILabel()
 		description.translatesAutoresizingMaskIntoConstraints = false
 		description.text = "Welcome to our cozy coffee corner, where every cup is a delightful for you."
-		description.font = .sora(size: ConstantsSize.fontSubTitle, weight: .regular)
-		description.textColor = .appLightGrey
-		description.numberOfLines = ConstantsSize.numberOfLines
+		description.font = .sora(size: Constraint.small, weight: .regular)
+		description.textColor = Colors.lightGrey
+		description.numberOfLines = 0
 		description.textAlignment = .center
 		return description
 	}()
@@ -55,18 +51,18 @@ class OnboardingViewController: UIViewController {
 		let startedButton = UIButton()
 		startedButton.translatesAutoresizingMaskIntoConstraints = false
 		startedButton.setTitle("Get Started", for: .normal)
-		startedButton.setTitleColor(.appWhite, for: .normal)
-		startedButton.titleLabel?.font = .sora(size: ConstantsSize.fontSubTitle, weight: .semiBold)
+		startedButton.setTitleColor(Colors.white, for: .normal)
+		startedButton.titleLabel?.font = .sora(size: Constraint.small, weight: .semiBold)
 		startedButton.backgroundColor = .brandOrange
-		startedButton.layer.cornerRadius = ConstantsSize.cornerRadius
-		startedButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
+		startedButton.layer.cornerRadius = Constraint.xSmall
+		startedButton.heightAnchor.constraint(equalToConstant: Constraint.xHuge).isActive = true
 		startedButton.addTarget(self, action: #selector(didTapGetStarted), for: .touchUpInside)
 		return startedButton
 	}()
 	
 	//MARK: - Init
-	init(storageManager: OnboardingStorageManagerProtocol) {
-		self.storageManager = storageManager
+	init(userDefaults: UserDefaults) {
+		self.userDefaults = userDefaults
 		super.init(nibName: nil, bundle: nil)
 	}
 	
@@ -74,8 +70,10 @@ class OnboardingViewController: UIViewController {
 		fatalError("init(coder:) has not been implemented")
 	}
 	
+	//MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		view.backgroundColor = Colors.background
 		setupUI()
 	}
 	
@@ -87,31 +85,31 @@ class OnboardingViewController: UIViewController {
 		
 		NSLayoutConstraint.activate([
 			// BackgroundImage
-			backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
+			backgroundImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -Constraint.mega),
 			backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+			backgroundImageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.65),
 			
 			// Button
-			getStartedButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: ConstantsSize.negativeMainIndent),
-			getStartedButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			getStartedButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			getStartedButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Constraint.medium),
+			getStartedButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constraint.medium),
+			getStartedButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constraint.medium),
 			
 			// Description
-			descriptionLabel.bottomAnchor.constraint(equalTo: getStartedButton.topAnchor, constant: ConstantsSize.negativeMainIndent),
-			descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			descriptionLabel.bottomAnchor.constraint(equalTo: getStartedButton.topAnchor, constant: -Constraint.medium),
+			descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constraint.medium),
+			descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constraint.medium),
 			
 			// Title
-			titleLabel.bottomAnchor.constraint(equalTo: descriptionLabel.topAnchor, constant: ConstantsSize.negativeMainIndent),
-			titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			titleLabel.bottomAnchor.constraint(equalTo: descriptionLabel.topAnchor, constant: -Constraint.medium),
+			titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constraint.medium),
+			titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constraint.medium)
 		])
 	}
 	
 	//MARK: - TapButtonFunc
 	@objc func didTapGetStarted() {
-		storageManager.checkUserStatus()
+		userDefaults.set(true, forKey: onboardingCompletedKey)
 		
 		guard let window = view.window else { return }
 		let homeViewController = HomeViewController()
