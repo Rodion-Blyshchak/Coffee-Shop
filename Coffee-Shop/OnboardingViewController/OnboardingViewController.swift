@@ -29,7 +29,7 @@ class OnboardingViewController: UIViewController {
 		let title = UILabel()
 		title.translatesAutoresizingMaskIntoConstraints = false
 		title.text = "Fall in Love with Coffee in Blissful Delight!"
-		title.font = .sora(size: Constraint.xxLarge, weight: .semiBold)
+		title.font = FontType.mainDisplay
 		title.textColor = Colors.primaryText
 		title.numberOfLines = 0
 		title.textAlignment = .center
@@ -40,7 +40,7 @@ class OnboardingViewController: UIViewController {
 		let description = UILabel()
 		description.translatesAutoresizingMaskIntoConstraints = false
 		description.text = "Welcome to our cozy coffee corner, where every cup is a delightful for you."
-		description.font = .sora(size: Constraint.small, weight: .regular)
+		description.font = FontType.subtitle
 		description.textColor = Colors.lightGrey
 		description.numberOfLines = 0
 		description.textAlignment = .center
@@ -52,7 +52,7 @@ class OnboardingViewController: UIViewController {
 		startedButton.translatesAutoresizingMaskIntoConstraints = false
 		startedButton.setTitle("Get Started", for: .normal)
 		startedButton.setTitleColor(Colors.white, for: .normal)
-		startedButton.titleLabel?.font = .sora(size: Constraint.small, weight: .semiBold)
+		startedButton.titleLabel?.font = FontType.buttonLarge
 		startedButton.backgroundColor = .brandOrange
 		startedButton.layer.cornerRadius = Constraint.xSmall
 		startedButton.heightAnchor.constraint(equalToConstant: Constraint.xHuge).isActive = true
@@ -115,7 +115,7 @@ class OnboardingViewController: UIViewController {
 		let homeViewController = HomeViewController()
 		
 		UIView.transition(with: window,
-						  duration: 0.4,
+						  duration: AnimationDuration.medium,
 						  options: .transitionCrossDissolve,
 						  animations: {
 			window.rootViewController = homeViewController
