@@ -10,14 +10,20 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 	var window: UIWindow?
-
-
+	
+	
 	func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 		guard let scena = (scene as? UIWindowScene) else { return }
 		let window = UIWindow(windowScene: scena)
-		window.rootViewController = ViewController()
+		
+		let userDefaults = UserDefaults.standard
+		
+		let onboardingViewController = OnboardingViewController(userDefaults: userDefaults)
+		let homeViewController = HomeViewController()
+		
+		window.rootViewController = userDefaults.bool(forKey: "onboardingCompleted") ? homeViewController : onboardingViewController
 		window.makeKeyAndVisible()
-				
+		
 		self.window = window
 	}
 
