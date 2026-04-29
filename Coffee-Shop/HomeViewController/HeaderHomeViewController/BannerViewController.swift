@@ -37,7 +37,7 @@ class BannerViewController: UIViewController {
 	
 	private let titleLabel: UILabel = {
 		let label = UILabel()
-		label.textColor = .white
+		label.textColor = Colors.white
 		label.font = FontType.mediumTitle
 		label.numberOfLines = 0
 		label.translatesAutoresizingMaskIntoConstraints = false
@@ -68,15 +68,15 @@ class BannerViewController: UIViewController {
 		bannerImageView.addSubview(titleLabel)
 		
 		NSLayoutConstraint.activate([ // TODO: - поправити
-			bannerImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
-			bannerImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-			bannerImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-			bannerImageView.heightAnchor.constraint(equalToConstant: 140),
+			bannerImageView.topAnchor.constraint(equalTo: view.topAnchor),
+			bannerImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constraint.small),
+			bannerImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constraint.small),
+			bannerImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 			
-			titleLabel.leadingAnchor.constraint(equalTo: bannerImageView.leadingAnchor, constant: 16),
-			titleLabel.bottomAnchor.constraint(equalTo: bannerImageView.bottomAnchor, constant: -16),
-			titleLabel.trailingAnchor.constraint(equalTo: bannerImageView.trailingAnchor, constant: -100)
-									])
+			titleLabel.leadingAnchor.constraint(equalTo: bannerImageView.leadingAnchor, constant: Constraint.xSmall),
+			titleLabel.bottomAnchor.constraint(equalTo: bannerImageView.bottomAnchor, constant: -Constraint.xSmall),
+			titleLabel.trailingAnchor.constraint(equalTo: bannerImageView.trailingAnchor, constant: -Constraint.xxGiant)
+		])
 	}
 	
 	// MARK: - Logic

@@ -29,5 +29,6 @@ enum Constraint {
 
 	static let giant: CGFloat = 80.0
 	static let xGiant: CGFloat = 100.0
-	static let mega: CGFloat = 120.0
+	static let xxGiant: CGFloat = 120.0
+	static let mega: CGFloat = 160.0
 }
