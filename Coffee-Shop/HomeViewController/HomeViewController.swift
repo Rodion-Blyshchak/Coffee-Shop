@@ -11,6 +11,7 @@ class HomeViewController: UIViewController {
 	// MARK: - Properties
 	private let bannerViewController = BannerViewController()
 	private let locationSelectorView = LocationSelectorView()
+	private let collectionCoffeCollectionView = CollectionCoffeCollectionView()
 	
 	private let verticalStackHeaderView: UIStackView = {
 		let stackView = UIStackView()
@@ -24,8 +25,9 @@ class HomeViewController: UIViewController {
 		super.viewDidLoad()
 		view.backgroundColor = Colors.mainBackground
 		
-		setupVerticalStackHeaderView()
 		locationSelectorView.delegate = self
+		setupVerticalStackHeaderView()
+		setupCollectionCoffeStackView()
 	}
 	
 	// MARK: - Setup
@@ -42,6 +44,18 @@ class HomeViewController: UIViewController {
 			verticalStackHeaderView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
 			
 			bannerViewController.view.heightAnchor.constraint(equalToConstant: Constraint.mega)
+		])
+	}
+	
+	private func setupCollectionCoffeStackView() {
+		view.addSubview(collectionCoffeCollectionView)
+		collectionCoffeCollectionView.translatesAutoresizingMaskIntoConstraints = false
+		
+		NSLayoutConstraint.activate([
+			collectionCoffeCollectionView.topAnchor.constraint(equalTo: verticalStackHeaderView.bottomAnchor, constant: Constraint.small),
+			collectionCoffeCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			collectionCoffeCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			collectionCoffeCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 		])
 	}
 }
