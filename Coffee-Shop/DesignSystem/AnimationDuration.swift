@@ -13,4 +13,5 @@ enum AnimationDuration {
 	static let slow: TimeInterval = 0.6
 	static let long: TimeInterval = 0.8
 	static let extraSlow: TimeInterval = 1.0
+	static let infinite: TimeInterval = 7.0
 }
