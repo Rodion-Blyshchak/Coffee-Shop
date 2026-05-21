@@ -27,12 +27,12 @@ class BannerViewController: UIViewController {
 	
 	// MARK: - UI Elements
 	private let bannerImageView: UIImageView = {
-		let iv = UIImageView()
-		iv.contentMode = .scaleAspectFill
-		iv.clipsToBounds = true
-		iv.layer.cornerRadius = Constraint.xSmall
-		iv.translatesAutoresizingMaskIntoConstraints = false
-		return iv
+		let imageView = UIImageView()
+		imageView.contentMode = .scaleAspectFill
+		imageView.clipsToBounds = true
+		imageView.layer.cornerRadius = Constraint.xSmall
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		return imageView
 	}()
 	
 	private let titleLabel: UILabel = {
