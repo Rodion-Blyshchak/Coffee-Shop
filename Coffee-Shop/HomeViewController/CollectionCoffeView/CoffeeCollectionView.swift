@@ -9,9 +9,6 @@ import UIKit
 
 class CoffeeCollectionView: UICollectionView {
 	//MARK: - Properties
-	private var listCellModel: [CollectionViewCellViewModel] = []
-	var cellDelegate: CoffeeCollectionViewCellDelegate?
-	
 	private var layoutView: UICollectionViewFlowLayout = {
 		let layout = UICollectionViewFlowLayout()
 		layout.scrollDirection = .vertical
@@ -37,18 +34,13 @@ class CoffeeCollectionView: UICollectionView {
 	
 	//MARK: - Setup
 	private func setupCollectionView() {
-		self.translatesAutoresizingMaskIntoConstraints = false
-		self.delegate = self
-		self.dataSource = self
+		translatesAutoresizingMaskIntoConstraints = false
 		
 		self.register(CoffeeCollectionViewCell.self, forCellWithReuseIdentifier: CoffeeCollectionViewCell.reuseId)
 	}
 	
 	//MARK: - UpdateData
-	func updateData(with models: [CollectionViewCellViewModel]) {
-		self.listCellModel = models
-		self.reloadData()
-		
+	func updateData() {
 		UIView.transition(
 			with: self,
 			duration: AnimationDuration.medium,
@@ -58,53 +50,5 @@ class CoffeeCollectionView: UICollectionView {
 			},
 			completion: nil
 		)
-	}
-}
-
-	//MARK: - Extension
-extension CoffeeCollectionView: UICollectionViewDelegate, UICollectionViewDataSource {
-	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		self.listCellModel.count
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CoffeeCollectionViewCell.reuseId, for: indexPath) as? CoffeeCollectionViewCell else {
-			return UICollectionViewCell()
-		}
-		
-		let viewModel = listCellModel[indexPath.item]
-		cell.configure(with: viewModel)
-		
-		cell.delegate = self.cellDelegate
-		
-		return cell
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		if let cell = collectionView.cellForItem(at: indexPath) as? CoffeeCollectionViewCell {
-			cellDelegate?.didSelectCoffeeCell(in: cell)
-		}
-	}
-}
-
-extension CoffeeCollectionView: UICollectionViewDelegateFlowLayout {
-	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-		let widthView = collectionView.bounds.width
-			let totalInsets = Constraint.xSmall * 2
-			let spacing = Constraint.xSmall
-			let targetWidth = (widthView - spacing - totalInsets) / 2
-			let sizingCell = CoffeeCollectionViewCell()
-		
-			let viewModel = listCellModel[indexPath.item]
-			sizingCell.configure(with: viewModel)
-		
-			let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
-			let autoSize = sizingCell.contentView.systemLayoutSizeFitting(
-				targetSize,
-				withHorizontalFittingPriority: .required,
-				verticalFittingPriority: .fittingSizeLevel
-			)
-			
-			return CGSize(width: targetWidth, height: autoSize.height)
 	}
 }

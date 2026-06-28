@@ -1,5 +1,5 @@
 //
-//  PrimaryButton.swift
+//  CustomIconButton.swift
 //  Coffee-Shop
 //
 //  Crafted by Rodion Blyshchak on 2026
@@ -7,13 +7,14 @@
 
 import UIKit
 
-class PrimaryButton: UIButton {
+class CustomIconButton: UIButton {
 	var tapAction: (() -> Void)?
 	
 	// MARK: - Init
-	init(title: String) {
+	init(image: UIImage?, tintColor: UIColor = Colors.primaryText) {
 		super.init(frame: .zero)
-		setTitle(title, for: .normal)
+		setImage(image, for: .normal)
+		self.tintColor = tintColor
 		setupButton()
 	}
 	
@@ -23,11 +24,8 @@ class PrimaryButton: UIButton {
 	
 	// MARK: - Setup
 	private func setupButton() {
-		backgroundColor = Colors.brandOrange
-		setTitleColor(.white, for: .normal)
-		titleLabel?.font = .sora(size: Constraint.xSmall, weight: .extraBold)
-		layer.cornerRadius = 10
 		translatesAutoresizingMaskIntoConstraints = false
+		self.backgroundColor = .clear
 		
 		addTarget(self, action: #selector(handleTap), for: .touchUpInside)
 	}
@@ -40,6 +38,16 @@ class PrimaryButton: UIButton {
 			UIView.animate(withDuration: 0.1) {
 				self.transform = .identity
 			}
+		}
+	}
+	
+	func setSelected(_ isSelected: Bool) {
+		if isSelected {
+			backgroundColor = Colors.brandOrange
+			setTitleColor(Colors.white, for: .normal)
+		} else {
+			backgroundColor = Colors.mainBackground
+			setTitleColor(Colors.secondaryText, for: .normal)
 		}
 	}
 }

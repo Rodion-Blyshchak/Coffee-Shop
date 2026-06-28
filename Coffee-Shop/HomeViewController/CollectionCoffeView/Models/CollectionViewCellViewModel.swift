@@ -11,9 +11,11 @@ struct CollectionViewCellViewModel {
 	let id: Int
 	let productImageView: UIImageView
 	let starIcon: UIImageView
-	let ratingLabel: String
+	let ratingLabel: Double
 	let titleLabel: String
-	let descriptionLabel: String
-	let priceLabel: String
+	let subtitleLabel: String
+	let descriptionContent: String
+	let price: Double
+	let categoryFilter: String
 }
 

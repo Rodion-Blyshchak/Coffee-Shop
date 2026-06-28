@@ -14,10 +14,12 @@ protocol CoffeeCollectionViewCellDelegate {
 
 class CoffeeCollectionViewCell: UICollectionViewCell {
 	// MARK: - Properties
-	static let reuseId = "CollectionCoffeCell"
+	static let reuseId = "CollectionCoffeeCell"
 	var itemID: Int?
 	private let addButton = PrimaryButton(title: "+")
 	var delegate: CoffeeCollectionViewCellDelegate?
+	
+	private let ratingStackView = RatingView(rating: 0.0)
 	
 	private let imageView: UIImageView = {
 		let imageView = UIImageView()
@@ -26,37 +28,6 @@ class CoffeeCollectionViewCell: UICollectionViewCell {
 		imageView.layer.cornerRadius = Constraint.xSmall
 		imageView.clipsToBounds = true
 		return imageView
-	}()
-	
-	private let starIcon: UIImageView = {
-		let icon = UIImageView()
-		icon.translatesAutoresizingMaskIntoConstraints = false
-		icon.image = UIImage(named: "star")
-		icon.contentMode = .scaleAspectFit
-		return icon
-	}()
-	
-	private let ratingLabel: UILabel = {
-		let label = UILabel()
-		label.translatesAutoresizingMaskIntoConstraints = false
-		label.textColor = Colors.primaryText
-		label.font = .systemFont(ofSize: Constraint.xSmall, weight: .medium)
-		label.numberOfLines = 1
-		return label
-	}()
-	
-	private let stackRating: UIStackView = {
-		let stack = UIStackView()
-		stack.translatesAutoresizingMaskIntoConstraints = false
-		stack.axis = .horizontal
-		stack.spacing = Constraint.xTiny
-		stack.alignment = .center
-		stack.backgroundColor = UIColor.black.withAlphaComponent(Opacity.half)
-		stack.layer.cornerRadius = Constraint.xSmall
-		stack.clipsToBounds = true
-		stack.isLayoutMarginsRelativeArrangement = true
-		stack.layoutMargins = UIEdgeInsets(top: Constraint.xTiny, left: Constraint.xTiny, bottom: Constraint.xTiny, right: Constraint.xTiny)
-		return stack
 	}()
 	
 	private let titleLabel: UILabel = {
@@ -109,13 +80,13 @@ class CoffeeCollectionViewCell: UICollectionViewCell {
 	
 	// MARK: - Setup
 	private func setupCellView() {
+		ratingStackView.translatesAutoresizingMaskIntoConstraints = false
+		
 		contentView.addSubview(imageView)
-		contentView.addSubview(stackRating)
+		contentView.addSubview(ratingStackView)
 		contentView.addSubview(titleLabel)
 		contentView.addSubview(subtitleLabel)
 		contentView.addSubview(stackPriceAndButton)
-		stackRating.addArrangedSubview(starIcon)
-		stackRating.addArrangedSubview(ratingLabel)
 		stackPriceAndButton.addArrangedSubview(priceLabel)
 		stackPriceAndButton.addArrangedSubview(addButton)
 		
@@ -125,10 +96,8 @@ class CoffeeCollectionViewCell: UICollectionViewCell {
 			imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constraint.tiny),
 			imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
 			
-			stackRating.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constraint.tiny),
-			stackRating.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constraint.tiny),
-			starIcon.widthAnchor.constraint(equalToConstant: Constraint.xSmall),
-			starIcon.heightAnchor.constraint(equalToConstant: Constraint.xSmall),
+			ratingStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constraint.tiny),
+			ratingStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -Constraint.tiny),
 			
 			titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: Constraint.xxSmall),
 			titleLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor),
@@ -143,19 +112,20 @@ class CoffeeCollectionViewCell: UICollectionViewCell {
 			stackPriceAndButton.trailingAnchor.constraint(equalTo: imageView.trailingAnchor),
 			stackPriceAndButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Constraint.xxSmall),
 			
-			addButton.widthAnchor.constraint(equalToConstant: Constraint.large),
-			addButton.heightAnchor.constraint(equalToConstant: Constraint.large)
+//			addButton.widthAnchor.constraint(equalToConstant: Constraint.xLarge),
+//			addButton.heightAnchor.constraint(equalToConstant: Constraint.xLarge)
 		])
 	}
 	
 	// MARK: - Configure
 	func configure(with item: CollectionViewCellViewModel) {
 		itemID = item.id
-		ratingLabel.text = item.ratingLabel
 		titleLabel.text = item.titleLabel
-		subtitleLabel.text = item.descriptionLabel
-		priceLabel.text = item.priceLabel
+		subtitleLabel.text = item.subtitleLabel
+		priceLabel.text = "$ \(item.price)"
 		imageView.image = item.productImageView.image
+		
+		ratingStackView.updateRating(Double(item.ratingLabel))
 		
 		addButton.tapAction = {[weak self] in
 			guard let self = self else { return }

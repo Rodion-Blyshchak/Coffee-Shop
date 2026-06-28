@@ -12,53 +12,50 @@ class HomeViewController: UIViewController {
 	private let fullCoffeeList: [CollectionViewCellViewModel] = [
 		CollectionViewCellViewModel(
 			id: 1,
-			productImageView: UIImageView(image: UIImage(named: "DefaultBannerImage")),
+			productImageView: UIImageView(image: UIImage(named: "bannerCoffeeCup")),
 			starIcon: UIImageView(image: UIImage(systemName: "star.fill")),
-			ratingLabel: "4.8",
+			ratingLabel: 4.8,
 			titleLabel: "Caffe Mocha",
-			descriptionLabel: "Deep Foam",
-			priceLabel: "$ 4.53"
+			subtitleLabel: "with Chocolate",
+			descriptionContent: "A mocha, also known as a caffe mocha, is a chocolate-flavored variant of a caffe latte, typically served in a glass rather than a mug. It consists of espresso, warm milk, and cocoa powder or chocolate syrup.",
+			price: 4.53,
+			categoryFilter: "Machiato"
 		),
 		CollectionViewCellViewModel(
 			id: 2,
 			productImageView: UIImageView(image: UIImage(named: "bannerMorningEspresso")),
 			starIcon: UIImageView(image: UIImage(systemName: "star.fill")),
-			ratingLabel: "4.8",
+			ratingLabel: 4.2,
 			titleLabel: "Flat White",
-			descriptionLabel: "Deep Foam Deep Foam Deep Foam Deep Foam",
-			priceLabel: "$ 4.53"
+			subtitleLabel: "with Oat Milk",
+			descriptionContent: "A flat white is an espresso-based coffee drink accompanied by steamed milk with a velvety texture and a thin layer of microfoam. It is perfect for those who appreciate a strong coffee flavor with a smooth finish.",
+			price: 2.3,
+			categoryFilter: "Latte"
 		),
 		CollectionViewCellViewModel(
 			id: 3,
 			productImageView: UIImageView(image: UIImage(named: "DefaultBannerImage")),
 			starIcon: UIImageView(image: UIImage(systemName: "star.fill")),
-			ratingLabel: "4.8",
+			ratingLabel: 3.8,
 			titleLabel: "Americano",
-			descriptionLabel: "Deep Foam",
-			priceLabel: "$ 4.53"
-		),
+			subtitleLabel: "Classic Black",
+			descriptionContent: "Caffè Americano is a type of coffee drink prepared by diluting an espresso with hot water, giving it a similar strength to, but different flavor from, traditionally brewed coffee. Simple, elegant, and energizing.",
+			price: 3.0,
+			categoryFilter: "Americano"
+		)
 	]
 	
+	private var filteredCoffeeList: [CollectionViewCellViewModel] = []
+	private let verticalScroll = ScrollContainerView(direction: .vertical)
 	private let locationSelectorView = LocationSelectorView()
 	private let searchBarView = SearchBarView()
 	private let bannerViewController = BannerViewController()
 	private let coffeeCollectionView = CoffeeCollectionView()
+	private let categoryFilterView = CategoryFilterView()
+	private var activeCategory: String = "All Coffee"
+	private var currentSearchText: String = ""
 	
 	private var coffeeCollectionHeightConstraint: NSLayoutConstraint?
-	
-	private let scrollView: UIScrollView = {
-		let scroll = UIScrollView()
-		scroll.translatesAutoresizingMaskIntoConstraints = false
-		scroll.alwaysBounceVertical = true
-		scroll.showsVerticalScrollIndicator = false
-		return scroll
-	}()
-	
-	private let contentView: UIView = {
-		let view = UIView()
-		view.translatesAutoresizingMaskIntoConstraints = false
-		return view
-	}()
 	
 	private let verticalStackHeaderView: UIStackView = {
 		let stackView = UIStackView()
@@ -71,8 +68,9 @@ class HomeViewController: UIViewController {
 	// MARK: - Lifecycle
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		//		view.backgroundColor = Colors.mainBackground
 		view.backgroundColor = Colors.background
+		filteredCoffeeList = fullCoffeeList
+		
 		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
 		tapOutsideKeyboard.cancelsTouchesInView = false
 		view.addGestureRecognizer(tapOutsideKeyboard)
@@ -80,17 +78,18 @@ class HomeViewController: UIViewController {
 		setupScrollView()
 		locationSelectorView.delegate = self
 		searchBarView.delegate = self
-		coffeeCollectionView.cellDelegate = self
+		categoryFilterView.filterDelegate = self
 		
 		setupVerticalStackHeaderView()
-		setupCollectionCoffeStackView()
+		setupDynamicFilters()
 		
 		coffeeCollectionView.isScrollEnabled = false
-		coffeeCollectionView.updateData(with: fullCoffeeList)
 	}
 	
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
+		coffeeCollectionView.collectionViewLayout.invalidateLayout()
+		coffeeCollectionView.layoutIfNeeded()
 		coffeeCollectionHeightConstraint?.constant = coffeeCollectionView.collectionViewLayout.collectionViewContentSize.height
 	}
 	
@@ -101,52 +100,84 @@ class HomeViewController: UIViewController {
 	
 	// MARK: - Setup
 	private func setupScrollView() {
-		view.addSubview(scrollView)
-		scrollView.addSubview(contentView)
+		view.addSubview(verticalScroll)
 		
 		NSLayoutConstraint.activate([
-			scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-			scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-			
-			contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
-			contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
-			contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
-			contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-			contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+			verticalScroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			verticalScroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			verticalScroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			verticalScroll.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 		])
 	}
 	
 	private func setupVerticalStackHeaderView() {
-		contentView.addSubview(verticalStackHeaderView)
+		addChild(bannerViewController)
+		
+		verticalScroll.contentView.addSubview(verticalStackHeaderView)
+		verticalScroll.contentView.addSubview(coffeeCollectionView)
+		
 		verticalStackHeaderView.translatesAutoresizingMaskIntoConstraints = false
+		coffeeCollectionView.translatesAutoresizingMaskIntoConstraints = false
+		
+		coffeeCollectionView.delegate = self
+		coffeeCollectionView.dataSource = self
+		
+		coffeeCollectionHeightConstraint = coffeeCollectionView.heightAnchor.constraint(equalToConstant: 0)
+		coffeeCollectionHeightConstraint?.isActive = true
 		
 		verticalStackHeaderView.addArrangedSubview(locationSelectorView)
 		verticalStackHeaderView.addArrangedSubview(searchBarView)
 		verticalStackHeaderView.addArrangedSubview(bannerViewController.view)
+		verticalStackHeaderView.addArrangedSubview(categoryFilterView)
 		
+		verticalStackHeaderView.setCustomSpacing(Constraint.small, after: bannerViewController.view)
+		bannerViewController.didMove(toParent: self)
+
 		NSLayoutConstraint.activate([
-			verticalStackHeaderView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Constraint.small),
-			verticalStackHeaderView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-			verticalStackHeaderView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+			verticalStackHeaderView.topAnchor.constraint(equalTo: verticalScroll.contentView.topAnchor, constant: Constraint.small),
+			verticalStackHeaderView.leadingAnchor.constraint(equalTo: verticalScroll.contentView.leadingAnchor),
+			verticalStackHeaderView.trailingAnchor.constraint(equalTo: verticalScroll.contentView.trailingAnchor),
 			
-			bannerViewController.view.heightAnchor.constraint(equalToConstant: Constraint.mega)
+			bannerViewController.view.heightAnchor.constraint(equalToConstant: ScreenSizeHelper.heightMultiplier(0.2)),
+			categoryFilterView.heightAnchor.constraint(equalToConstant: Constraint.xxxLarge),
+			
+			coffeeCollectionView.topAnchor.constraint(equalTo: verticalStackHeaderView.bottomAnchor),
+			coffeeCollectionView.leadingAnchor.constraint(equalTo: verticalScroll.contentView.leadingAnchor),
+			coffeeCollectionView.trailingAnchor.constraint(equalTo: verticalScroll.contentView.trailingAnchor),
+
+			coffeeCollectionView.bottomAnchor.constraint(equalTo: verticalScroll.contentView.bottomAnchor)
 		])
 	}
 	
-	private func setupCollectionCoffeStackView() {
-		contentView.addSubview(coffeeCollectionView)
-		coffeeCollectionView.translatesAutoresizingMaskIntoConstraints = false
-		coffeeCollectionHeightConstraint = coffeeCollectionView.heightAnchor.constraint(equalToConstant: 0)
-		coffeeCollectionHeightConstraint?.isActive = true
+	// MARK: - Filter logic
+	private func setupDynamicFilters() {
+		let rawCategories = fullCoffeeList.map{ $0.categoryFilter }
+		let uniqueCategories = Array(Set(rawCategories)).sorted()
 		
-		NSLayoutConstraint.activate([
-			coffeeCollectionView.topAnchor.constraint(equalTo: verticalStackHeaderView.bottomAnchor, constant: Constraint.small),
-			coffeeCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-			coffeeCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-			coffeeCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
-		])
+		if uniqueCategories.isEmpty || uniqueCategories.count == 1 {
+			categoryFilterView.isHidden = true
+			return
+		}
+		
+		let finalCategories = ["All Coffee"] + uniqueCategories
+		
+		categoryFilterView.isHidden = false
+		categoryFilterView.updateCategories(newCategories: finalCategories)
+	}
+	
+	private func applyCombinedFilters() {
+		filteredCoffeeList = fullCoffeeList.filter { coffee in
+			let matchesCategory = (activeCategory == "All Coffee") || (coffee.categoryFilter == activeCategory)
+			
+			let matchesSearch = currentSearchText.isEmpty ||
+			coffee.titleLabel.lowercased().contains(currentSearchText.lowercased()) ||
+			coffee.descriptionContent.lowercased().contains(currentSearchText.lowercased())
+			
+			return matchesCategory && matchesSearch
+		}
+		
+		coffeeCollectionView.updateData()
+		view.setNeedsLayout()
 	}
 }
 
@@ -176,42 +207,41 @@ extension HomeViewController: LocationSelectorDelegate {
 
 extension HomeViewController: SearchBarViewDelegate {
 	func searchBarView(_ searchBarView: SearchBarView, didChangeSearchText text: String) {
-		if text.isEmpty {
-			coffeeCollectionView.updateData(with: fullCoffeeList)
-		} else {
-			let filteredList = fullCoffeeList.filter { coffee in
-				coffee.titleLabel.lowercased().contains(text.lowercased()) ||
-				coffee.descriptionLabel.lowercased().contains(text.lowercased())
-			}
-			coffeeCollectionView.updateData(with: filteredList)
-		}
-		view.setNeedsLayout()
+		currentSearchText = text
+		applyCombinedFilters()
+	}
+}
+
+extension HomeViewController: CategoryFilterViewDelegate {
+	func categoryFilterView(_ filterView: CategoryFilterView, didSelectCategory category: String) {
+		activeCategory = category
+		applyCombinedFilters()
 	}
 }
 
 extension HomeViewController: CoffeeCollectionViewCellDelegate {
 	func didTapButtonAction(in cell: CoffeeCollectionViewCell) {
 		guard let indexPath = coffeeCollectionView.indexPath(for: cell) else { return }
-		let selectedCoffee = fullCoffeeList[indexPath.item]
+		let selectedCoffee = filteredCoffeeList[indexPath.item]
 		
 		print("+, ID: \(selectedCoffee.id)")
 	}
 	
 	func didSelectCoffeeCell(in cell: CoffeeCollectionViewCell) {
 		guard let indexPath = coffeeCollectionView.indexPath(for: cell) else { return }
-		let selectedCoffee = fullCoffeeList[indexPath.item]
+		let selectedCoffee = filteredCoffeeList[indexPath.item]
 		let descriptionViewController = DetailCardViewController()
 		
-		let detailModel = DetailCardViewControllerModel(
+		let detailModel = DetailCardViewModel(
 			id: selectedCoffee.id,
 			productImageView: selectedCoffee.productImageView.image ?? UIImage(named: "bannerCoffeeCup"),
-			titleInfoLabel: selectedCoffee.titleLabel,
-			subTitleInfoLabel: selectedCoffee.descriptionLabel,
-			rating: CoffeeRatingViewModel(score: Double(selectedCoffee.ratingLabel) ?? 0.0, reviewsCount: 230), descriptionTitleLabel: "",
-			descriptionContentLabel: "",
-			availableSizes: [.small, .medium, .large],
-			selectedSize: .medium,
-			price: 4.53
+			title: selectedCoffee.titleLabel,
+			subtitle: selectedCoffee.subtitleLabel,
+			rating: Double(selectedCoffee.ratingLabel),
+			descriptionContent: selectedCoffee.descriptionContent,
+			availableSizes: "M",
+			titlePrice: "Price",
+			price: selectedCoffee.price
 		)
 		
 		descriptionViewController.viewModel = detailModel
@@ -219,3 +249,51 @@ extension HomeViewController: CoffeeCollectionViewCellDelegate {
 		navigationController?.pushViewController(descriptionViewController, animated: true)
 	}
 }
+
+extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+		self.filteredCoffeeList.count
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CoffeeCollectionViewCell.reuseId, for: indexPath) as? CoffeeCollectionViewCell else {
+			return UICollectionViewCell()
+		}
+		
+		let viewModel = filteredCoffeeList[indexPath.item]
+		cell.configure(with: viewModel)
+		
+		cell.delegate = self
+		
+		return cell
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		if let cell = collectionView.cellForItem(at: indexPath) as? CoffeeCollectionViewCell {
+			self.didSelectCoffeeCell(in: cell)
+		}
+	}
+}
+
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
+	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+		let widthView = collectionView.bounds.width
+		let totalInsets = Constraint.xSmall * 2
+		let spacing = Constraint.xSmall
+		let targetWidth = (widthView - spacing - totalInsets) / 2
+		let sizingCell = CoffeeCollectionViewCell()
+		
+		let viewModel = filteredCoffeeList[indexPath.item]
+		sizingCell.configure(with: viewModel)
+		
+		let targetSize = CGSize(width: targetWidth, height: UIView.layoutFittingCompressedSize.height)
+		let autoSize = sizingCell.contentView.systemLayoutSizeFitting(
+			targetSize,
+			withHorizontalFittingPriority: .required,
+			verticalFittingPriority: .fittingSizeLevel
+		)
+		
+		return CGSize(width: targetWidth, height: autoSize.height)
+	}
+}
+
