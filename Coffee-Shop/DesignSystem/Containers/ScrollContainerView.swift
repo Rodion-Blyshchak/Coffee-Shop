@@ -50,7 +50,7 @@ class ScrollContainerView: UIView {
 			scrollView.alwaysBounceVertical = true
 			scrollView.showsVerticalScrollIndicator = false
 		case .horizontal:
-			scrollView.alwaysBounceVertical = true
+			scrollView.alwaysBounceHorizontal = true
 			scrollView.showsHorizontalScrollIndicator = false
 		}
 		

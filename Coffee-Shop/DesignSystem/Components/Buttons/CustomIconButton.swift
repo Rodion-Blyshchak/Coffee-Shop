@@ -42,12 +42,7 @@ class CustomIconButton: UIButton {
 	}
 	
 	func setSelected(_ isSelected: Bool) {
-		if isSelected {
-			backgroundColor = Colors.brandOrange
-			setTitleColor(Colors.white, for: .normal)
-		} else {
-			backgroundColor = Colors.mainBackground
-			setTitleColor(Colors.secondaryText, for: .normal)
-		}
+		backgroundColor = isSelected ? Colors.brandOrange : Colors.mainBackground
+		setTitleColor(isSelected ? Colors.white : Colors.secondaryText, for: .normal)
 	}
 }

@@ -28,7 +28,7 @@ class PrimaryButton: UIButton {
 		titleLabel?.font = .sora(size: Constraint.xSmall, weight: .extraBold)
 		layer.cornerRadius = Constraint.xxSmall
 		translatesAutoresizingMaskIntoConstraints = false
-		contentEdgeInsets = UIEdgeInsets(top: 8, left: Constraint.xSmall, bottom: 8, right: Constraint.xSmall)
+		contentEdgeInsets = UIEdgeInsets(top: Constraint.tiny, left: Constraint.xSmall, bottom: Constraint.tiny, right: Constraint.xSmall)
 		
 		addTarget(self, action: #selector(handleTap), for: .touchUpInside)
 	}
@@ -45,13 +45,8 @@ class PrimaryButton: UIButton {
 	}
 	
 	func setSelected(_ isSelected: Bool) {
-		if isSelected {
-			backgroundColor = Colors.brandOrange
-			setTitleColor(.white, for: .normal)
-		} else {
-			backgroundColor = Colors.mainBackground
-			setTitleColor(Colors.secondaryText, for: .normal)
-		}
+		backgroundColor = isSelected ? Colors.brandOrange : Colors.mainBackground
+		setTitleColor(isSelected ? Colors.white : Colors.secondaryText, for: .normal)
 	}
 	
 	func updateTitle(_ newTitle: String) {

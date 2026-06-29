@@ -82,10 +82,10 @@ class FooterContentBlockView: UIView {
 			containerStackView.topAnchor.constraint(equalTo: topAnchor, constant: Constraint.small),
 			containerStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constraint.small),
 			containerStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constraint.small),
-			containerStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
+			containerStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constraint.small),
 			
-			button.heightAnchor.constraint(equalToConstant: 56),
-			button.widthAnchor.constraint(equalToConstant: 217)
+			button.heightAnchor.constraint(equalToConstant: Constraint.xHuge),
+			button.widthAnchor.constraint(equalToConstant: Constraint.xxMega)
 		])
 	}
 	

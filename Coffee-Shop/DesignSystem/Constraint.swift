@@ -8,6 +8,7 @@
 import UIKit
 
 enum Constraint {
+	static let zero: CGFloat = 0.0
 	static let xTiny: CGFloat = 4.0
 	static let tiny: CGFloat = 8.0
 	
@@ -31,4 +32,6 @@ enum Constraint {
 	static let xGiant: CGFloat = 100.0
 	static let xxGiant: CGFloat = 120.0
 	static let mega: CGFloat = 160.0
+	static let xMega: CGFloat = 200.0
+	static let xxMega: CGFloat = 220.0
 }
