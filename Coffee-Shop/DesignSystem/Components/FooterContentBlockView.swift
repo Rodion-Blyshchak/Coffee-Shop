@@ -8,6 +8,11 @@
 import UIKit
 
 class FooterContentBlockView: UIView {
+	enum Constants {
+	 static let buttonHeight = 56.0
+	 static let buttonWidth = 220.0
+	}
+	
 	//MARK: - Properties
 	private let button = PrimaryButton(title: "")
 	
@@ -84,8 +89,8 @@ class FooterContentBlockView: UIView {
 			containerStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constraint.small),
 			containerStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Constraint.small),
 			
-			button.heightAnchor.constraint(equalToConstant: Constraint.xHuge),
-			button.widthAnchor.constraint(equalToConstant: Constraint.xxMega)
+			button.heightAnchor.constraint(equalToConstant: Constants.buttonHeight),
+			button.widthAnchor.constraint(equalToConstant: Constants.buttonWidth)
 		])
 	}
 	

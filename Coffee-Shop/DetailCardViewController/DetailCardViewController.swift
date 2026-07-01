@@ -160,7 +160,7 @@ class DetailCardViewController: UIViewController {
 			print("Клік на серце!")
 		}
 		
-		let favoriteeBarButtonItem = UIBarButtonItem(customView: favoriteButton)
-		self.navigationItem.rightBarButtonItem = favoriteeBarButtonItem
+		let favoriteBarButtonItem = UIBarButtonItem(customView: favoriteButton)
+		self.navigationItem.rightBarButtonItem = favoriteBarButtonItem
 	}
 }
